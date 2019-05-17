@@ -6,6 +6,18 @@
 #include "Film.h"
 #include "Exception.h"
 
+class Notification{
+public:
+    Notification(std::string _content){ content = _content;}
+
+private:
+    std::string content;
+    bool read = false;
+
+};
+
+
+
 class Person{
 public:
     Person(std::string user, std::string pass , std::string _email, int _age , int _id){
@@ -16,8 +28,14 @@ public:
         id = _id;
         
     }
-
-
+    std::string get_username(){ return username;}
+    std::string get_password(){ return password;}
+    int get_id(){ return id;}
+    virtual std::string get_type () = 0;
+    virtual void add_film(Film* NewFilm){}
+    virtual void follow(Person* p){}
+    void give_notification(std::string content);
+    
 
 
 
@@ -28,7 +46,7 @@ protected:
     int age;
     int id;
     int money;
-    std::vector< std::string> notification;
+    std::vector <Notification> notification;
     
 
 };

@@ -5,6 +5,20 @@
 #include <vector>
 
 class Film{
+public:
+    Film (std::string _name, int _year, int _length, int _price,std::string _summary,
+        std::string _director , int _id)
+    {
+        name = _name;
+        year = _year;
+        length = _length;
+        price = _price;
+        summary = _summary;
+        director = _director;
+        id = _id;
+    }
+
+
 private:
     std::string name;
     int year;

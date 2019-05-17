@@ -4,19 +4,19 @@ a.out: main.o Network.o Customer.o Person.o Publisher.o Film.o
 	g++ -std=c++11 main.o Network.o Customer.o Person.o Publisher.o Film.o -o a.out
 
 main.o: main.cpp Network.h Customer.h Person.h Publisher.h Film.h Exception.h
-	g++ -std=c++11 -c main.cpp
+	g++ -std=c++11 -c -g main.cpp
 
 Person.o: Person.cpp Exception.h
-	g++ -std=c++11 -c Person.cpp
+	g++ -std=c++11 -c -g Person.cpp
 
 Customer.o: Customer.cpp Person.h Film.h Exception.h
-	g++ -std=c++11 -c Customer.cpp
+	g++ -std=c++11 -c -g Customer.cpp
 
 Publisher.o: Publisher.cpp Person.h Film.h Exception.h
-	g++ -std=c++11 -c Publisher.cpp
+	g++ -std=c++11 -c -g Publisher.cpp
 
 Network.o: Network.cpp Person.h Film.h Customer.h Publisher.h Exception.h
-	g++ -std=c++11 -c Network.cpp
+	g++ -std=c++11 -c -g Network.cpp
 
 .PHONY: clean
 clean:
