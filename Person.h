@@ -9,7 +9,7 @@
 class Person{
 public:
     Person(std::string user, std::string pass , std::string _email, int _age , int _id){
-        username = user:
+        username = user;
         password = pass;
         email = _email;
         age = _age;

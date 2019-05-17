@@ -5,8 +5,8 @@ using namespace std;
 
 int main(){
 
-
-
+    Network network;
+    network.run();
 
 
 

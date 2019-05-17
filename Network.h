@@ -6,17 +6,20 @@
 #include "Exception.h"
 
 class Network{
-
-
-
-
+public:
+    void run();
+    void handle_post_comands (std::vector <std::string> word, Person*& current_user);
+    void handle_put_comands ();
+    void handle_get_comands ();
+    void handle_delet_comands ();
 
 private:
 
-    std::vector<Publisher> publishers;
-    std::vector<Customer> custumers;
+    std::vector<Person*> users;
+    
     std::vector<Film> films;
-    int money;
+    
+    int money = 0;
 
 
 };

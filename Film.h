@@ -5,7 +5,6 @@
 #include <vector>
 
 class Film{
-
 private:
     std::string name;
     int year;

@@ -8,8 +8,9 @@
 
 
 class Publisher : public Person{
+public:
     Publisher(std::string user, std::string pass , std::string _email, int _age, int _id)
-    : Person(usre, pass, _email, _age, _id)
+    : Person(user, pass, _email, _age, _id){}
 
 
 
