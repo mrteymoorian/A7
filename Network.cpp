@@ -86,7 +86,7 @@ void Network::add_film (vector <string> word, Person*& current_user){
     }
     
     
-    films.push_back(Film(name, stoi(year), stoi(length), stoi(price) , summary , director, films.size() + 1));
+    films.push_back(Film(name, stoi(year), stoi(length), stoi(price) , summary , director, films.size() + 1, current_user));
     current_user->add_film(& films[films.size() - 1]);
     cout << OK <<endl;
 }
@@ -111,7 +111,62 @@ void Network::follow (vector <string> word, Person*& current_user){
 }
 
 
+void Network::add_my_money (vector <string> word, Person*& current_user){
+    if (word.size() != 5)
+        throw BadRequest();
 
+    int amount = stoi(word[4]);
+    current_user->inc_money(amount); 
+    cout << OK <<endl;
+}
+
+void Network::buy_film (vector <string> word, Person*& current_user){
+    if (word.size() != 5)
+        throw BadRequest();
+    int film_id = stoi(word[4]);
+    for (int i = 0 ;i < films.size() ; i++){
+        if (film_id == films[i].get_id()){
+            current_user->buy_film(&films[i] , films[i].get_price());
+            network_money += films[i].get_price();
+            films[i].publisher()->give_notification("User " + current_user->get_username() +
+                " with id " + to_string(current_user->get_id()) + " buy your film " + films[i].get_name() +
+               " with id " + to_string(films[i].get_id()) );
+            cout << OK <<endl;
+            return;
+        }
+    }
+    throw NotFound();
+
+
+}
+
+void Network::rate_film (vector <string> word, Person*& current_user){
+    if (word.size() != 7)
+        throw BadRequest();
+    int film_id, score;
+    for (int i = 3; i < word.size() ; i = i + 2){
+        if (word[i] == "film_id")
+            film_id = stoi(word[i+1]);
+        if (word[i] == "score")
+            score = stoi(word[i+1]);
+    }
+    
+    for (int i = 0 ;i < films.size() ; i++){
+        if (film_id == films[i].get_id()){ 
+            if (!current_user->has_rated_this_film(film_id))   
+                films[i].set_score(score);
+            else
+                films[i].set_score_again(score , current_user->get_score_of_this_film(&films[i]) );
+            current_user->rate_film(&films[i] , score);
+            films[i].publisher()->give_notification("User " + current_user->get_username() +
+                " with id " + to_string(current_user->get_id()) + " rate your film " + films[i].get_name() +
+                " with id " + to_string(films[i].get_id()) );
+            cout << OK <<endl;
+            return;
+        }
+    }
+    throw NotFound();
+}
 
 void Network::handle_post_comands (vector <string> word, Person*& current_user){
      if (word[1] != "signup" && word[1] != "login" && word[1] != "films" &&
@@ -132,12 +187,17 @@ void Network::handle_post_comands (vector <string> word, Person*& current_user){
         else 
             throw PermissionDenid();    
     }
-    if (word[1] == "followers"){
-        if (current_user->get_type() == "customer"){
-            follow(word, current_user);
-        }
-        else 
-            throw PermissionDenid();    
+    if (word[1] == "followers"){    
+        follow(word, current_user);
+    }
+    if (word[1] == "money" && word.size() > 2){    
+        add_my_money(word, current_user);
+    }
+    if (word[1] == "buy"){    
+        buy_film(word, current_user);
+    }
+    if (word[1] == "rate"){    
+        rate_film(word, current_user);
     }
 
 
@@ -159,14 +219,20 @@ void Network::run(){
             if (word[0] != POST && word[0] != PUT && word[0] != GET && word[0] != DELET)
                 throw BadRequest();
         }catch(exception& e){
-            cout << e.what() <<endl;
+            if (e.what() == "stoi")
+                cout << "Bad Request" <<endl;
+            else
+                cout << e.what() <<endl;
         }
         
         if (word[0] == POST){
             try{
                 handle_post_comands(word , current_user);
             }catch(exception& e){
-                cout << e.what() <<endl;
+                if (e.what() == "stoi")
+                    cout << "Bad Request" <<endl;
+                else
+                    cout << e.what() <<endl;
             }
         }
 

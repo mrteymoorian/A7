@@ -16,13 +16,16 @@ public:
     void handle_login (std::vector <std::string> word, Person*& current_user);
     void add_film (std::vector <std::string> word, Person*& current_user);
     void follow(std::vector <std::string> word, Person*& current_user);
+    void add_my_money (std::vector <std::string> word, Person*& current_user);
+    void buy_film (std::vector <std::string> word, Person*& current_user);
+    void rate_film (std::vector <std::string> word, Person*& current_user);
 private:
 
     std::vector<Person*> users;
     
     std::vector<Film> films;
     
-    int money = 0;
+    int network_money = 0;
 
 
 };
