@@ -249,6 +249,9 @@ void Network::handle_post_comands (vector <string> word, Person*& current_user){
     if (word[1] == "signup"){
         handle_signup(word, current_user);    
     }
+    if (current_user == NULL)
+        throw PermissionDenid();
+        
     if (word[1] == "login"){
         handle_login(word, current_user);    
     }
@@ -341,6 +344,8 @@ void Network::run(){
         istringstream buf(input);
         while(buf >> temp_word)
             word.push_back(temp_word);
+        if (word.size() == 0)
+            continue;
         
         try{
             if (word[0] != POST && word[0] != PUT && word[0] != GET && word[0] != DELET)
@@ -365,6 +370,8 @@ void Network::run(){
 
         if (word[0] == PUT){
             try{
+                if (current_user == NULL)
+                    throw PermissionDenid();
                 handle_put_comands(word , current_user);
             }catch(exception& e){
                 if (e.what() == "stoi")
