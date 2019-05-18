@@ -6,6 +6,8 @@
 #define  GET "GET"
 #define  DELET "DELET"
 #define OK "OK"
+#define EMPTY -1
+#define _EMPTY ""
 using namespace std;
 
 void Network::handle_signup (vector <string> word, Person*& current_user){
@@ -40,6 +42,7 @@ void Network::handle_signup (vector <string> word, Person*& current_user){
             users.push_back( new Publisher(username, password, email, stoi(age), users.size()+1));
             cout << OK << endl;
             current_user = users[users.size() - 1];
+            money_acount[current_user] = 0;
     }
     if (word.size() == 13 && publisher == "false"){
             users.push_back( new Customer(username, password, email, stoi(age), users.size()+1));
@@ -119,7 +122,23 @@ void Network::add_my_money (vector <string> word, Person*& current_user){
     current_user->inc_money(amount); 
     cout << OK <<endl;
 }
+void Network::manage_money(Film* current_film){
+    
+    if (current_film->get_final_score() < 5){
+       money_acount[ current_film->publisher()] += 0.8 * current_film->get_price();
+       network_money += 0.2 * current_film->get_price();
+    }
+    if (current_film->get_final_score() >= 5 && current_film->get_final_score() < 8){
+       money_acount[ current_film->publisher()] += 0.9 * current_film->get_price();
+       network_money += 0.1 * current_film->get_price();
+    }
+    if (current_film->get_final_score() >= 8){
+       money_acount[ current_film->publisher()] += 0.95 * current_film->get_price();
+       network_money += 0.05 * current_film->get_price();
+    }
 
+
+}
 void Network::buy_film (vector <string> word, Person*& current_user){
     if (word.size() != 5)
         throw BadRequest();
@@ -127,7 +146,7 @@ void Network::buy_film (vector <string> word, Person*& current_user){
     for (int i = 0 ;i < films.size() ; i++){
         if (film_id == films[i].get_id()){
             current_user->buy_film(&films[i] , films[i].get_price());
-            network_money += films[i].get_price();
+            manage_money(&films[i]);
             films[i].publisher()->give_notification("User " + current_user->get_username() +
                 " with id " + to_string(current_user->get_id()) + " buy your film " + films[i].get_name() +
                " with id " + to_string(films[i].get_id()) );
@@ -168,6 +187,59 @@ void Network::rate_film (vector <string> word, Person*& current_user){
     throw NotFound();
 }
 
+void Network::comment_film (vector <string> word, Person*& current_user){
+    if (word.size() != 7)
+        throw BadRequest();
+    int film_id;
+    string content;
+    for (int i = 3; i < word.size() ; i = i + 2){
+        if (word[i] == "film_id")
+            film_id = stoi(word[i+1]);
+        if (word[i] == "content")
+            content = word[i+1];
+    }
+    
+   current_user->comment_on_this_film(film_id , content);
+
+   for (int i = 0 ;i < films.size() ; i++){
+        if (film_id == films[i].get_id()){ 
+            films[i].publisher()->give_notification("User " + current_user->get_username() +
+                " with id " + to_string(current_user->get_id()) + " comment on your film " + films[i].get_name() +
+                " with id " + to_string(films[i].get_id()) );
+            cout << OK <<endl;
+            return;
+        }
+    }
+    
+}
+
+void Network::reply_comment(vector <string> word, Person*& current_user){
+    if (word.size() != 9)
+        throw BadRequest();
+    int film_id;
+    int comment_id;
+    string content;
+    for (int i = 3; i < word.size() ; i = i + 2){
+        if (word[i] == "film_id")
+            film_id = stoi(word[i+1]);
+        if (word[i] == "comment_id")
+            comment_id = stoi(word[i+1]);
+        if (word[i] == "content")
+            content = word[i+1];
+    }
+    
+    current_user->reply_comment(film_id , comment_id, content);
+    cout << OK <<endl;
+    return;
+    
+}
+
+void Network::give_my_money(Person* current_user){
+    current_user->inc_money(money_acount[current_user]);
+    money_acount[current_user] = 0;
+    cout << OK << endl;
+}
+
 void Network::handle_post_comands (vector <string> word, Person*& current_user){
      if (word[1] != "signup" && word[1] != "login" && word[1] != "films" &&
          word[1] != "money" && word[1] != "replies" && word[1] != "followers" &&
@@ -187,11 +259,27 @@ void Network::handle_post_comands (vector <string> word, Person*& current_user){
         else 
             throw PermissionDenid();    
     }
+
+    if (word[1] == "replies"){
+        if (current_user->get_type() == "publisher"){
+            reply_comment(word, current_user);
+        }
+        else 
+            throw PermissionDenid();    
+    }
+
+
     if (word[1] == "followers"){    
         follow(word, current_user);
     }
     if (word[1] == "money" && word.size() > 2){    
         add_my_money(word, current_user);
+    }
+    if (word[1] == "money" && word.size() == 2){    
+        if (current_user->get_type() == "publisher")
+            give_my_money(current_user);
+        else
+            throw PermissionDenid();  
     }
     if (word[1] == "buy"){    
         buy_film(word, current_user);
@@ -199,9 +287,48 @@ void Network::handle_post_comands (vector <string> word, Person*& current_user){
     if (word[1] == "rate"){    
         rate_film(word, current_user);
     }
+    if (word[1] == "comments"){    
+        comment_film(word, current_user);
+    }
 
 
+}
 
+void Network::handle_put_comands (std::vector <std::string> word, Person*& current_user){
+    if (word[1] != "films")
+        throw NotFound();
+    if (current_user->get_type() != "publisher")
+        throw PermissionDenid();
+    int film_id, year = EMPTY, length = EMPTY, price = EMPTY;
+    string name = _EMPTY , summary = _EMPTY , director = _EMPTY;
+    for (int i = 3; i < word.size() - 1 ; i++ ){
+        if (word[i] == "film_id")
+            film_id = stoi(word[i+1]);
+        if (word[i] == "name")
+            name = word[i+1];
+        if (word[i] == "year")
+            year = stoi(word[i+1]);
+        if (word[i] == "length")
+            length = stoi(word[i+1]);
+        if (word[i] == "price")
+            price = stoi(word[i+1]);
+        if (word[i] == "summary")
+            summary = word[i+1];
+        if (word[i] == "director")
+            director = word[i+1];
+    }
+
+    for (int i = 0; i < films.size() ; i++ ){
+        if (films[i].get_id() == film_id){
+            if (films[i].publisher() == current_user){
+                films[i].edit(name, year, length, price, summary, director);
+                cout << OK << endl;
+            }
+            else
+                throw BadRequest();
+            
+        }
+    }
 
 }
 
@@ -236,7 +363,16 @@ void Network::run(){
             }
         }
 
-
+        if (word[0] == PUT){
+            try{
+                handle_put_comands(word , current_user);
+            }catch(exception& e){
+                if (e.what() == "stoi")
+                    cout << "Bad Request" <<endl;
+                else
+                    cout << e.what() <<endl;
+            }
+        }
 
     }
 

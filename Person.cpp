@@ -27,3 +27,13 @@ bool Person::has_rated_this_film(int film_id){
     }
     return false;
 }
+
+void Person::comment_on_this_film(int film_id, std::string content){
+    for (int i = 0 ; i < bought_film.size() ; i++){
+        if (bought_film[i]->get_id() == film_id){
+            bought_film[i]->give_comment(content , this);
+            return;
+        }
+    }
+    throw NotFound();
+}
