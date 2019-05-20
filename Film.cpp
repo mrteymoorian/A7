@@ -46,6 +46,7 @@ void Film::reply_comment(int comment_id ,std::string content){
         }
     }
 }
+
 void Comment::reply(std::string _content){
     content.push_back(_content);
 }
@@ -66,4 +67,12 @@ void Film::edit (std::string _name, int _year, int _length, int _price,std::stri
     if (_director != _EMPTY)
         director = _director;
 
+}
+
+void Film::delete_comment(int comment_id){
+    for (int i = 0;i < comment.size() ; i++){
+        if (comment[i].get_id() == comment_id){
+            comment.erase(comment.begin() + i);
+        }
+    }
 }

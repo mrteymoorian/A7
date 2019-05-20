@@ -39,6 +39,9 @@ public:
         id = _id;
         my_publisher = _my_publisher;
     }
+
+    void delete_yourself(){ has_been_deldeted = true;}
+    void delete_comment(int comment_id);
     std::string get_name(){ return name;}
     int get_id(){ return id;}
     int get_price(){ return price;}
@@ -59,6 +62,7 @@ private:
     std::string director;
     int id;
     float final_score = 0;
+    bool has_been_deldeted = false;
     std::vector <int > score;
     std::vector <Comment> comment;
     Person* my_publisher;

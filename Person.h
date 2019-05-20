@@ -36,6 +36,7 @@ public:
     int get_id(){ return id;}
     virtual std::string get_type () = 0;
     virtual void add_film(Film* NewFilm){}
+    virtual void delete_film(int film_id){}
     virtual void reply_comment(int film_id ,int comment_id,std::string content){}
     virtual void follow(Person* p){}
     void give_notification(std::string content);

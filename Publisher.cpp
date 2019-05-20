@@ -20,3 +20,13 @@ void Publisher::reply_comment(int film_id ,int comment_id,std::string content){
     }
     throw NotFound();
 }
+
+void Publisher::delete_film(int film_id){
+    for (int i = 0;i < film.size() ; i++){
+        if (film[i]->get_id() == film_id){
+            film[i]->delete_yourself();
+            return ;
+        }
+    }
+    throw PermissionDenid();
+}

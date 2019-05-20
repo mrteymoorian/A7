@@ -16,6 +16,7 @@ public:
     void add_film(Film* NewFilm);
     void follow(Person* p);
     void reply_comment(int film_id ,int comment_id,std::string content);
+    void delete_film(int film_id);
 private:
     
     std::vector <Film*> film;

@@ -4,7 +4,7 @@
 #define  POST "POST"
 #define  PUT "PUT"
 #define  GET "GET"
-#define  DELET "DELET"
+#define  DELETE "DELETE"
 #define OK "OK"
 #define EMPTY -1
 #define _EMPTY ""
@@ -297,7 +297,7 @@ void Network::handle_post_comands (vector <string> word, Person*& current_user){
 
 }
 
-void Network::handle_put_comands (std::vector <std::string> word, Person*& current_user){
+void Network::handle_put_comands (vector <string> word, Person*& current_user){
     if (word[1] != "films")
         throw NotFound();
     if (current_user->get_type() != "publisher")
@@ -335,6 +335,54 @@ void Network::handle_put_comands (std::vector <std::string> word, Person*& curre
 
 }
 
+void Network::delete_film(vector <string> word, Person*& current_user){
+    if (word.size() != 5)
+        throw BadRequest();
+    int film_id , flag = 0;
+    if (word[3] == "film_id")
+        film_id = stoi(word[4]);
+    else 
+        throw BadRequest();
+    for (int i = 0 ; i < films.size() ; i++ )
+        if( films[i].get_id() == film_id)
+            flag = 1;
+    if (flag == 0)
+        throw NotFound();    
+    
+    current_user->delete_film(film_id);
+
+}
+void Network::delete_comment(vector <string> word, Person*& current_user){
+    if (word.size() != 7)
+        throw BadRequest();
+    int film_id , comment_id;
+    for (int i = 3; i < word.size() ; i = i + 2){
+        if (word[i] == "film_id")
+            film_id = stoi(word[i+1]);
+        if (word[i] == "comment_id")
+            comment_id = stoi(word[i+1]);
+    }
+    
+    for (int i = 0; i < films.size() ; i++){
+        if (films[i].get_id() == film_id && films[i].publisher() == current_user){
+            films[i].delete_comment(comment_id);
+        }
+    }
+
+}
+void Network::handle_delete_comands (vector <string> word, Person*& current_user){
+    if (word[1] != "films" && word[1] != "comments")
+        throw NotFound(); 
+    if (current_user->get_type() != "publisher")
+        throw PermissionDenid();
+    if (word[1] == "films"){
+        delete_film(word, current_user);
+    }
+    if (word[1] == "comments"){
+        delete_comment(word, current_user);
+    }
+    
+}
 void Network::run(){
     string input;
     Person* current_user = NULL;
@@ -348,7 +396,7 @@ void Network::run(){
             continue;
         
         try{
-            if (word[0] != POST && word[0] != PUT && word[0] != GET && word[0] != DELET)
+            if (word[0] != POST && word[0] != PUT && word[0] != GET && word[0] != DELETE)
                 throw BadRequest();
         }catch(exception& e){
             if (e.what() == "stoi")
@@ -373,6 +421,18 @@ void Network::run(){
                 if (current_user == NULL)
                     throw PermissionDenid();
                 handle_put_comands(word , current_user);
+            }catch(exception& e){
+                if (e.what() == "stoi")
+                    cout << "Bad Request" <<endl;
+                else
+                    cout << e.what() <<endl;
+            }
+        }
+        if (word[0] == DELETE){
+            try{
+                if (current_user == NULL)
+                    throw PermissionDenid();
+                handle_delete_comands(word , current_user);
             }catch(exception& e){
                 if (e.what() == "stoi")
                     cout << "Bad Request" <<endl;

@@ -12,7 +12,7 @@ public:
     void handle_post_comands (std::vector <std::string> word, Person*& current_user);
     void handle_put_comands (std::vector <std::string> word, Person*& current_user);
     void handle_get_comands (std::vector <std::string> word, Person*& current_user);
-    void handle_delet_comands (std::vector <std::string> word, Person*& current_user);
+    void handle_delete_comands (std::vector <std::string> word, Person*& current_user);
     void handle_signup (std::vector <std::string> word, Person*& current_user);
     void handle_login (std::vector <std::string> word, Person*& current_user);
     void add_film (std::vector <std::string> word, Person*& current_user);
@@ -24,6 +24,8 @@ public:
     void rate_film (std::vector <std::string> word, Person*& current_user);
     void comment_film (std::vector <std::string> word, Person*& current_user);
     void reply_comment (std::vector <std::string> word, Person*& current_user);
+    void delete_film(std::vector <std::string> word, Person*& current_user);
+    void delete_comment(std::vector <std::string> word, Person*& current_user);
 private:
 
     std::vector<Person*> users;
