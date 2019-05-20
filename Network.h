@@ -26,6 +26,7 @@ public:
     void reply_comment (std::vector <std::string> word, Person*& current_user);
     void delete_film(std::vector <std::string> word, Person*& current_user);
     void delete_comment(std::vector <std::string> word, Person*& current_user);
+    void show_followers(std::vector <std::string> word, Person*& current_user);
 private:
 
     std::vector<Person*> users;

@@ -113,7 +113,6 @@ void Network::follow (vector <string> word, Person*& current_user){
 
 }
 
-
 void Network::add_my_money (vector <string> word, Person*& current_user){
     if (word.size() != 5)
         throw BadRequest();
@@ -122,6 +121,7 @@ void Network::add_my_money (vector <string> word, Person*& current_user){
     current_user->inc_money(amount); 
     cout << OK <<endl;
 }
+
 void Network::manage_money(Film* current_film){
     
     if (current_film->get_final_score() < 5){
@@ -139,6 +139,7 @@ void Network::manage_money(Film* current_film){
 
 
 }
+
 void Network::buy_film (vector <string> word, Person*& current_user){
     if (word.size() != 5)
         throw BadRequest();
@@ -297,6 +298,63 @@ void Network::handle_post_comands (vector <string> word, Person*& current_user){
 
 }
 
+void Network::delete_film(vector <string> word, Person*& current_user){
+    if (word.size() != 5)
+        throw BadRequest();
+    int film_id , flag = 0;
+    if (word[3] == "film_id")
+        film_id = stoi(word[4]);
+    else 
+        throw BadRequest();
+    for (int i = 0 ; i < films.size() ; i++ )
+        if( films[i].get_id() == film_id)
+            flag = 1;
+    if (flag == 0)
+        throw NotFound();    
+    
+    current_user->delete_film(film_id);
+
+}
+
+void Network::delete_comment(vector <string> word, Person*& current_user){
+    if (word.size() != 7)
+        throw BadRequest();
+    int film_id , comment_id ;
+    for (int i = 3; i < word.size() ; i = i + 2){
+        if (word[i] == "film_id")
+            film_id = stoi(word[i+1]);
+        if (word[i] == "comment_id")
+            comment_id = stoi(word[i+1]);
+    }
+    
+    for (int i = 0; i < films.size() ; i++){
+        if (films[i].get_id() == film_id ){
+            if(films[i].publisher() == current_user){
+                films[i].delete_comment(comment_id);
+                return ;
+            }
+            else 
+                throw PermissionDenid();
+        }
+    }
+    throw NotFound();
+
+}
+
+void Network::handle_delete_comands (vector <string> word, Person*& current_user){
+    if (word[1] != "films" && word[1] != "comments")
+        throw NotFound(); 
+    if (current_user->get_type() != "publisher")
+        throw PermissionDenid();
+    if (word[1] == "films"){
+        delete_film(word, current_user);
+    }
+    if (word[1] == "comments"){
+        delete_comment(word, current_user);
+    }
+    
+}
+
 void Network::handle_put_comands (vector <string> word, Person*& current_user){
     if (word[1] != "films")
         throw NotFound();
@@ -335,54 +393,35 @@ void Network::handle_put_comands (vector <string> word, Person*& current_user){
 
 }
 
-void Network::delete_film(vector <string> word, Person*& current_user){
-    if (word.size() != 5)
+void Network::show_followers(vector <string> word, Person*& current_user){
+    if (word.size() != 2)
         throw BadRequest();
-    int film_id , flag = 0;
-    if (word[3] == "film_id")
-        film_id = stoi(word[4]);
+    if (current_user->get_type() == "publisher")
+            current_user->show_followers();
     else 
-        throw BadRequest();
-    for (int i = 0 ; i < films.size() ; i++ )
-        if( films[i].get_id() == film_id)
-            flag = 1;
-    if (flag == 0)
-        throw NotFound();    
-    
-    current_user->delete_film(film_id);
-
-}
-void Network::delete_comment(vector <string> word, Person*& current_user){
-    if (word.size() != 7)
-        throw BadRequest();
-    int film_id , comment_id;
-    for (int i = 3; i < word.size() ; i = i + 2){
-        if (word[i] == "film_id")
-            film_id = stoi(word[i+1]);
-        if (word[i] == "comment_id")
-            comment_id = stoi(word[i+1]);
-    }
-    
-    for (int i = 0; i < films.size() ; i++){
-        if (films[i].get_id() == film_id && films[i].publisher() == current_user){
-            films[i].delete_comment(comment_id);
-        }
-    }
-
-}
-void Network::handle_delete_comands (vector <string> word, Person*& current_user){
-    if (word[1] != "films" && word[1] != "comments")
-        throw NotFound(); 
-    if (current_user->get_type() != "publisher")
         throw PermissionDenid();
-    if (word[1] == "films"){
-        delete_film(word, current_user);
-    }
-    if (word[1] == "comments"){
-        delete_comment(word, current_user);
-    }
-    
 }
+
+void Network::handle_get_comands (vector <string> word, Person*& current_user){
+    if (word[1] != "followers" && word[1] != "films" && word[1] != "purchased"
+        && word[1] != "notifications")
+        throw NotFound();
+    if (word[1] == "followers"){
+        show_followers(word, current_user);    
+    }
+    if (word[1] == "films"){
+        //handle_signup(word, current_user);    
+    }
+    if (word[1] == "purchased"){
+        //handle_signup(word, current_user);    
+    }
+    if (word[1] == "notifications"){
+        //handle_signup(word, current_user);    
+    }
+
+
+}
+
 void Network::run(){
     string input;
     Person* current_user = NULL;
@@ -428,11 +467,25 @@ void Network::run(){
                     cout << e.what() <<endl;
             }
         }
+
         if (word[0] == DELETE){
             try{
                 if (current_user == NULL)
                     throw PermissionDenid();
                 handle_delete_comands(word , current_user);
+            }catch(exception& e){
+                if (e.what() == "stoi")
+                    cout << "Bad Request" <<endl;
+                else
+                    cout << e.what() <<endl;
+            }
+        }
+
+        if (word[0] == GET){
+            try{
+                if (current_user == NULL)
+                    throw PermissionDenid();
+                handle_get_comands(word , current_user);
             }catch(exception& e){
                 if (e.what() == "stoi")
                     cout << "Bad Request" <<endl;

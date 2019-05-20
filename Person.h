@@ -33,10 +33,12 @@ public:
     }
     std::string get_username(){ return username;}
     std::string get_password(){ return password;}
+    std::string get_email(){ return email;}
     int get_id(){ return id;}
     virtual std::string get_type () = 0;
     virtual void add_film(Film* NewFilm){}
     virtual void delete_film(int film_id){}
+    virtual void show_followers();
     virtual void reply_comment(int film_id ,int comment_id,std::string content){}
     virtual void follow(Person* p){}
     void give_notification(std::string content);

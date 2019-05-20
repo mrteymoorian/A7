@@ -30,3 +30,13 @@ void Publisher::delete_film(int film_id){
     }
     throw PermissionDenid();
 }
+
+void Publisher::show_followers(){
+    cout << "List of Followers" << endl;
+    cout << "#. User Id | User Username | User Email" << endl;
+    for (int i = 0 ;i < followers.size() ; i++){
+        cout << i+1 << ". " << followers[i]->get_id() << " | " <<
+            followers[i]->get_username() << " | " << followers[i]->get_email() <<endl;
+    }
+
+}

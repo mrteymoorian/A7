@@ -73,6 +73,8 @@ void Film::delete_comment(int comment_id){
     for (int i = 0;i < comment.size() ; i++){
         if (comment[i].get_id() == comment_id){
             comment.erase(comment.begin() + i);
+            return ;
         }
     }
+    throw NotFound();
 }
