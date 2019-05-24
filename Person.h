@@ -12,7 +12,9 @@ class Film;
 class Notification{
 public:
     Notification(std::string _content){ content = _content;}
-
+    std::string get_content(){ return content;}
+    bool has_been_read(){ return read;}
+    void the_person_read(){ read = true;}
 private:
     std::string content;
     bool read = false;
@@ -31,6 +33,7 @@ public:
         id = _id;
         
     }
+    
     std::string get_username(){ return username;}
     std::string get_password(){ return password;}
     std::string get_email(){ return email;}
@@ -38,16 +41,23 @@ public:
     virtual std::string get_type () = 0;
     virtual void add_film(Film* NewFilm){}
     virtual void delete_film(int film_id){}
-    virtual void show_followers();
+    virtual void show_followers(){}
+    virtual void show_published_films(std::vector <std::string> word){}
     virtual void reply_comment(int film_id ,int comment_id,std::string content){}
-    virtual void follow(Person* p){}
+    virtual bool follow(Person* p){}
+
+    void show_purchased_films(std::vector <std::string> word);
     void give_notification(std::string content);
     void inc_money(float amount){ money += amount;}
-    void buy_film(Film* newfilm ,int price);
+    bool buy_film(Film* newfilm ,int price);
     void rate_film(Film* newfilm , int score);
     bool has_rated_this_film(int film_id);
     int get_score_of_this_film(Film* this_film){ return rated_film_with_score[this_film];}
     void comment_on_this_film(int film_id, std::string content);
+    bool have_bought_this_film(int film_id);
+    void show_unread_notifications();
+    void show_read_notifications(int limit);
+
 protected:
     std::string username;
     std::string password;

@@ -14,10 +14,11 @@ public:
     std::string get_type(){ return "publisher";}
 
     void add_film(Film* NewFilm);
-    void follow(Person* p);
+    bool follow(Person* p);
     void reply_comment(int film_id ,int comment_id,std::string content);
     void delete_film(int film_id);
     void show_followers();
+    void show_published_films(std::vector <std::string> word);
 private:
     
     std::vector <Film*> film;

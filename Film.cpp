@@ -1,6 +1,8 @@
 #include "Film.h"
 #define EMPTY -1
 #define _EMPTY ""
+#include <iomanip>
+ 
 using namespace std;
 
 
@@ -30,11 +32,12 @@ void Film::set_score_again(int newscore , int oldscore){
 }
 
 void Film::give_comment(std::string content , Person* author){
+    int _id;
     if (comment.size() != 0)
-        id = comment[comment.size() - 1].get_id() + 1;
+        _id = comment[comment.size() - 1].get_id() + 1;
     else 
-        id = 1;
-    comment.push_back(Comment(content, id, author));
+        _id = 1;
+    comment.push_back(Comment(content, _id, author));
 }
 
 void Film::reply_comment(int comment_id ,std::string content){
@@ -77,4 +80,59 @@ void Film::delete_comment(int comment_id){
         }
     }
     throw NotFound();
+}
+
+void Film::print_yourdef(){
+    cout << id << " | " << name << " | " << length << " | " << price << " | " <<
+          final_score << " | " << year << " | " << director << endl;
+}
+
+bool Film::pass_the_filters(string _name, string _director, int min_year, int max_year, int min_rate, int  _price){
+    if (_name != _EMPTY)
+        if (name != _name)
+            return false;
+    if (_director != _EMPTY)
+        if (director != _director)
+            return false;
+    if (_price != EMPTY)
+        if (price != _price)
+            return false;
+    if (min_rate != EMPTY)
+        if (final_score < min_rate)
+            return false;
+
+    if (min_year != EMPTY)
+        if (year < min_year)
+            return false;
+
+    if (max_year != EMPTY)
+        if (year > max_year)
+            return false;
+
+    return true; 
+}
+
+void Comment::print(){
+    for (int i = 0 ; i < content.size() ; i++){
+        if (i == 0)
+            cout << id << ". " << content[i];
+        else 
+            cout << id << "." << i << ". " << content[i];
+    }
+}
+void Film::show_detail(){
+    cout << "Details of Film " << name << endl;
+    cout << "Id = " << id << endl;
+    cout << "Director = " << director << endl;
+    cout << "Length = " << length << endl;
+    cout << "Year = " << year << endl;
+    cout << "Summary = " << summary << endl;
+    cout << "Rate = " << setprecision(2) <<final_score << endl;
+    cout << "Price = " << price << endl;
+    cout << endl;
+    cout << "Comments" << endl;
+    for (int i = 0 ; i < comment.size() ; i++){
+        comment[i].print();
+    }
+    cout << endl;
 }

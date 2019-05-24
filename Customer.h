@@ -11,7 +11,7 @@ public:
     Customer(std::string user, std::string pass , std::string _email, int _age, int _id)
     : Person(user, pass, _email, _age, _id){}
     std::string get_type(){ return "customer";}
-    void follow(Person* p);
+    bool follow(Person* p);
     
 
 private:

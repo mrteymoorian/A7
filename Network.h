@@ -1,5 +1,6 @@
 #ifndef NETWORK_H
 #define NETWORK_H
+#include <string>
 #include "Publisher.h"
 #include "Customer.h"
 #include "Film.h"
@@ -8,6 +9,7 @@
 
 class Network{
 public:
+    ~Network();
     void run();
     void handle_post_comands (std::vector <std::string> word, Person*& current_user);
     void handle_put_comands (std::vector <std::string> word, Person*& current_user);
@@ -27,11 +29,19 @@ public:
     void delete_film(std::vector <std::string> word, Person*& current_user);
     void delete_comment(std::vector <std::string> word, Person*& current_user);
     void show_followers(std::vector <std::string> word, Person*& current_user);
+    void show_published_films(std::vector <std::string> word, Person*& current_user);
+    void show_detail_of_film(std::vector <std::string> word , Person*& current_user);
+    void show_recommandation_films( Person*& current_user ,int film_id);
+    void search_film(std::vector <std::string> word);
+    void show_purchased_films(std::vector <std::string> word, Person*& current_user);
+    void show_read_notifications(std::vector <std::string> word, Person*& current_user);
+    bool can_be_recommanded(Person*& current_user , int index , int film_id);
+
 private:
 
     std::vector<Person*> users;
     
-    std::vector<Film> films;
+    std::vector<Film*> films;
     
     std::map<Person* , float> money_acount;
 

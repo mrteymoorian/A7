@@ -31,7 +31,7 @@ class PermissionDenid : public std::exception
 public:
     virtual const char* what() const throw()
   {
-    return "Permission Denid";
+    return "Permission Denied";
   }
 
 };
